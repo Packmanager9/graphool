@@ -1949,7 +1949,7 @@
             this.energy = 0
             this.generate = 0
             if (this.type == 4) {
-                this.generate = .12345
+                this.generate = .3333
             }
             this.gencap = 10
             this.energy = 0
