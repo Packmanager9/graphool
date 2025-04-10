@@ -6,6 +6,7 @@
             t += 9
         }
     }
+    let nodecap = 1000
     let video_recorder
     let recording = 0
     // function CanvasCaptureToWEBM(canvas, bitrate) {
@@ -155,7 +156,7 @@
             }
             gamepadAPI.axesStatus = axes; // assign received values
             gamepadAPI.buttonsStatus = pressed;
-            // ////console.log(pressed); // return buttons for debugging purposes
+            // ////////console.log(pressed); // return buttons for debugging purposes
             return pressed;
         },
         buttonPressed: function(button, hold) {
@@ -331,6 +332,7 @@
             return Math.atan2(this.object.y - this.target.y, this.object.x - this.target.x)
         }
         draw() {
+            ld++
             let linewidthstorage = canvas_context.lineWidth
             canvas_context.strokeStyle = this.color
             canvas_context.lineWidth = this.width
@@ -465,7 +467,7 @@
                 // canvas_context.fill()
                 canvas_context.stroke();
             } else {
-                //console.l\og("The circle is below a radius of 0, and has not been drawn. The circle is:", this)
+                //////console.l\og("The circle is below a radius of 0, and has not been drawn. The circle is:", this)
             }
         }
         move() {
@@ -1037,7 +1039,7 @@
         canvas.style.background = style
         window.setInterval(function() {
             main()
-        }, 40)
+        }, 10)
         document.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
         });
@@ -1070,7 +1072,7 @@
     }
     
     function gamepad_control(object, speed = 1) { // basic control for objects using the controler
-        //         //console.l\og(gamepadAPI.axesStatus[1]*gamepadAPI.axesStatus[0]) //debugging
+        //         //////console.l\og(gamepadAPI.axesStatus[1]*gamepadAPI.axesStatus[0]) //debugging
         if (typeof object.body != 'undefined') {
             if (typeof(gamepadAPI.axesStatus[1]) != 'undefined') {
                 if (typeof(gamepadAPI.axesStatus[0]) != 'undefined') {
@@ -1385,7 +1387,7 @@
     class PolygonDrawer {
         constructor(points, color = '#000000', width = 3) {
             this.points = points; // Array of Point objects
-            //console.l\og(points)
+            //////console.l\og(points)
             this.color = color;
             this.width = width;
             this.hull = this.points
@@ -1451,7 +1453,7 @@
     
             // Determine the color based on which sum is maximum
             let calccolor;
-            //console.l\og(this.sums)
+            //////console.l\og(this.sums)
             const maxSum = Math.max(...this.sums);
             const maxIndex = this.sums.indexOf(maxSum);
     
@@ -1637,7 +1639,7 @@
             } // Fourth point
         ];
     
-        //console.log(points)
+        //////console.log(points)
         // Use a Set to track unique positions
         const uniquePositions = new Set();
     
@@ -1668,7 +1670,7 @@
         q = Math.round(q)
         r = Math.round(r)
         s = Math.round(s)
-        //console.log(arePointsOverlapping(a, b, c, d, p, q, r, s))
+        //////console.log(arePointsOverlapping(a, b, c, d, p, q, r, s))
         if (arePointsOverlapping(a, b, c, d, p, q, r, s)) {
             return false
         }
@@ -1691,8 +1693,8 @@
     // const polygon1 = [{x: 1, y: 1}, {x: 3, y: 3}, {x: 1, y: 3}, {x: 3, y: 1}]; // Self-intersecting
     // const polygon2 = [{x: 1, y: 1}, {x: 1, y: 5}, {x: 5, y: 5}, {x: 5, y: 1}]; // Not self-intersecting
     
-    // //console.l\og(isPolygonSelfIntersecting(polygon1)); // true
-    // //console.l\og(isPolygonSelfIntersecting(polygon2)); // false
+    // //////console.l\og(isPolygonSelfIntersecting(polygon1)); // true
+    // //////console.l\og(isPolygonSelfIntersecting(polygon2)); // false
     
     
     
@@ -1797,7 +1799,7 @@
             for (let t = 0; t < this.pairs.length; t++) {
                 this.hash[this.pairs[t]] = this.lester[t]
             }
-            //console.log(this)
+            //////console.log(this)
         }
     }
     
@@ -1893,7 +1895,7 @@
     let organeo = new Organism()
     
     
-    //console.log(organeo)
+    //////console.log(organeo)
     
     let rmod = Math.floor(Math.random() * 25) + 5
     let gmod = Math.floor(Math.random() * 25) + 5
@@ -1927,105 +1929,178 @@
             this.y = y
             this.link = new LineOP(this, this, "cyan")
             this.link.list  =[]
-            this.lout = 10//8 + (Math.random() * 24)
+            this.lout = 12//8 + (Math.random() * 24)
             this.las = []
             for (let t = 0; t < 100; t++) {
                 this.las.push(Math.random() * 6.283)
             }
             this.rigs = []
-            this.times = []
+            this.
+            times = []
             this.ticks = []
             for (let t = 0; t < 100; t++) {
                 this.times.push(0)
-                this.ticks.push(((Math.random() - .5) / 40))
+                this.ticks.push(((Math.random() - .5) / 20))
             }
             for (let t = 0; t < 100; t++) {
-                this.rigs.push(1 - ((Math.random() / 40) + .975))
+                this.rigs.push(1 - ((Math.random() / 20) + .95))
             }
             this.pushout =  Math.random() * 6.283
             this.pushoutsto = this.pushout
-            // //console.log(this.id)
+            // //////console.log(this.id)
             globalnodes.push(this)
             this.energy = 0
             this.generate = 0
             if (this.type == 4) {
-                this.generate = .3333
+                this.generate = .4
             }
-            this.gencap = 10
+            this.gencap = 1000
             this.energy = 0
     
             this.hit = 0
         }
         map(k,f){
+            if(this.dead == 1){
+                return
+            }
 
             let scare = {}
 
             for(let d = 0;d<f.length;d++){
-                scare[d] = k[d]
+                scare[k[d]] = d
             }
-            // //console.log(scare)
-
             return scare
         }
-        dupe(num, macro, me){
-            if(globalnodes.length > 500 || num == 0){
+        dupe(num){
+            if(this.dead == 1){
+                return
+            }
+            if(globalnodes.length > nodecap || num == 0){
                 return false
             }
+            // let node = new Node(Math.random()*720 ,Math.random()*720, this.type)
             let node = new Node(this.x+((Math.random()-.5)*10), this.y+((Math.random()-.5)*10) , this.type)
             return node
         }
-        tupe(num, macro, me,node){
-            if(globalnodes.length > 500 || num == 0){
+
+
+        //a teleporting magnolia tree that goes on adventures but lives on one place
+        tupe(macro, node){
+            if(this.dead == 1){
                 return
             }
-            let keys = Object.keys(macro.match)
-            // //console.log(keys)
-
-            // me -= macro.start
-            let arts = this.map(keys, macro.f)
-
-
-            let letters = macro.match[arts[me]]
-            //console.log(macro,me,arts,macro.match[arts[me]])
-
-
-            // for(let t = 0;t<letters.length;t++){
-            //     if(letters[t] >= 0){
-            //         //console.log(letters[t])
-            //         letters[t] = parseInt(letters[t], 10)
-            //     }else{
-            //         letters.splice(t,1)
-            //     }
+            let table = []
+            // for(let t= 0 ;t<macro.f.length;t++){
+            //     table[macro.f[t]] = t
             // }
-
-            // //console.log(letters)
-            console.log(globalnodes.length, letters, macro.start)
-            for(let t = 0;t<letters.length;t++){
-                //console.log(globalnodes[letters[t]+macro.start])
-                if(globalnodes[t+macro.start]){
-
-                node.connect(globalnodes[t+macro.start])
-                }
+            //  let  babble  = macro.match[me]
+            //  //console.log(macro.f, node.linkup)
+            //  //console.log(table)
+            for(let t= 0 ;t<node.linkup.length;t++){
+            let offset = macro.f.indexOf(node.linkup[t])
+            console.log(offset, macro.f, node.linkup) 
+            if(globalnodes[offset+macro.start].hitcon != 1){
+            if(offset != -1){
+  
+                node.connect(globalnodes[(offset+macro.start)])
+                // //console.log(globalnodes[(offset+macro.start)].type, globalnodes[node.linkup[t]].type)
+                // globalnodes[offset+macro.start].hitcon = 1
+                // node.hitcon = 1
+            }
+            }
             }
         }
+
+
+
+
+
+
+        // tupe(num, macro, me,node){
+        //     if(globalnodes.length > nodecap || num == 0){
+        //         return
+        //     }
+        //     let keys = Object.keys(macro.match)
+        //     let arts = this.map(keys, macro.f)
+
+        //     ////console.log( arts, me)
+        //     let letters = macro.match[arts[me]] 
+        //     for(let t = 0;t<letters.length;t++){
+        //         if(globalnodes[letters[t]+macro.start]){
+
+        //         node.connect(globalnodes[letters[t]+macro.start])
+        //         }
+        //     }
+        // }
         energyBalance(){
+            if(this.dead == 1){
+                return
+            }
 
 
             let glist = [this]
 
+            let flist = [this]
         
-            let f = [this.id]
-            for(let t =0 ;t<glist.length;t++){
-                for(let k = 0;k<glist[t].link.list.length;k++){
-                      if(f.includes(globalnodes[glist[t].link.list[k]].id) || glist.length > globalnodes.length){
-                      }else{
-                        f.push(globalnodes[glist[t].link.list[k]].id)
-                        glist.push(globalnodes[glist[t].link.list[k]])
-                      }
+            let f = [globalnodes.indexOf(this)]
+            for(let t =0 ;t<flist.length;t++){
+                if(flist[t]){ 
+                    for(let k = 0;k<flist[t].neighbors.length;k++){
+                          if(f.includes((flist[t].neighbors[k]))){
+                          }else{
+                            if(globalnodes[flist[t].neighbors[k]]){
+                                f.push((flist[t].neighbors[k]))
+                                // if(flist[t]){ 
+                                flist.push(globalnodes[flist[t].neighbors[k]])
+
+                            }
+                            // }
+                          }
+                    }
+
+                }
+            }
+            // //console.log(flist)
+            for(let t =0 ;t<flist.length;t++){
+                for(let k = 0;k<flist[t].neighbors.length;k++){
+                    if(f.includes((flist[t].neighbors[k]))){
+
+
+                        // //console.log(flist)
+                        let screw = 0
+                        let snapout =0
+                        for(let w = 0;w<glist.length;w++){
+                            if(snapout == 1){
+                                continue
+                            }
+                            if(glist[w].x > 0){ 
+                                screw = -1
+                            }
+                            if(keysPressed['g']){
+                            //console.log(globalnodes[flist[t].neighbors[k]].id)
+                            }
+                            if(glist[w].id == globalnodes[flist[t].neighbors[k]].id){ 
+                             screw = 1
+                             snapout =1
+                            //  //console.log('s')
+                            }
+                        }
+
+
+                        if(screw == -1){
+                            glist.push(globalnodes[flist[t].neighbors[k]])
+
+                        }
+                    }
                 }
             }
 
-            let g = 0
+
+            
+            if(keysPressed['g']){
+                //console.log(f,glist)
+            }
+            let g = 0 
             let m = 0
             let p = 0
             for(let t =0 ;t<glist.length;t++){
@@ -2037,12 +2112,12 @@
             }
 
             if(keysPressed[' ']){
-                //console.log(glist)
+                //////console.log(glist)
             }
             g/=m
             p/=m
 
-            // //console.log(g,m)
+            // //////console.log(g,m)
 
             let matmatch = {}
             let startin = globalnodes.length
@@ -2051,18 +2126,21 @@
             macro.start = startin
             macro.f = f.sort((a,b)=>a>b?1:-1)
 
-            if(g >= 10 && glist.length>1 && macrodupe == 0){
+            if(g >= (200/Math.sqrt(Math.sqrt(m))) && glist.length>1 && macrodupe == 0){
 
+                g -= (200/Math.sqrt(Math.sqrt(m))) 
+                glist.sort((a,b)=>globalnodes.indexOf(a)>globalnodes.indexOf(b)?1:-1)
                 macrodupe = 1
 
+                //console.log(glist)
                 for(let t =0 ;t<glist.length;t++){
-                        matmatch[glist[t].id] = []
-                        let mv  = []
+                        matmatch[globalnodes.indexOf(glist[t])] = []
+                        // let mv  = []
                     for(let k = 0;k<glist[t].link.list.length;k++){
-                        if(!mv.includes(glist[t].link.list[k])){
-                            mv.push(glist[t].link.list[k])
-                            matmatch[glist[t].id].push(glist[t].link.list[k])
-                        }
+                        if(!matmatch[globalnodes.indexOf(glist[t])].includes(glist[t].link.list[k])){
+                            // mv.push(glist[t].link.list[k])
+                            matmatch[globalnodes.indexOf(glist[t])].push(glist[t].link.list[k]) 
+                        } 
                     }
 
                 }
@@ -2071,19 +2149,25 @@
 
                 let nodds = []
                 for(let t =0 ;t<glist.length;t++){
-                    let nodd = glist[t].dupe(glist[t].link.list.length, macro, globalnodes.indexOf(glist[t]))
+                    let nodd = glist[t].dupe(2)
                     if(nodd != false){
-                        nodd.t = t
+                        nodd.linkup = [...glist[t].neighbors]
+                        nodd.t = globalnodes.indexOf(glist[t])
                         nodds.push(nodd)
                     }
                 }
                 for(let t =0 ;t<nodds.length;t++){
-                    nodds[t].tupe(10, macro, nodds[t].t, nodds[t])
+                    nodds[t].tupe(macro, nodds[t])
+                    for(let k =0 ;k<nodds.length;k++){
+                        // nodds[k].hitcon = 0
+                    }
+                }
+                for(let t =0 ;t<nodds.length;t++){
+                    nodds[t].hitcon = 0
                 }
 
-                g -=10
 
-                // //console.log(macro)
+                // //////console.log(macro)
             }
 
 
@@ -2098,47 +2182,63 @@
 
             this.energy = g
             this.pushoutsto = p
+            // this.pushout = p
 
-            // //console.log(this)
+            // //////console.log(this)
             this.hit = 1
 
         }
         connect(node) {
+            if(this.dead == 1){
+                return
+            }
 
+            if(globalnodes.indexOf(node) == globalnodes.indexOf(this)){
+                return
+            }
+            if(this.neighbors.includes(globalnodes.indexOf(node)) || node.neighbors.includes(globalnodes.indexOf(this))){
+                return
+            }
+
+
+            // this.neighbors.push(globalnodes.indexOf(node))
+            // node.neighbors.push(globalnodes.indexOf(this))
+
+            // return
 
             if (this.type == 0 || this.type == 3) {
                 if(this.type == 3){
                     if(node.type != 3 && node.type != 1){
 
-                        this.neighbors.push(node.id)
-                        node.neighbors.push(this.id)
+                        this.neighbors.push(globalnodes.indexOf(node))
+                        node.neighbors.push(globalnodes.indexOf(this))
                     }
                 }else{
             
-                    this.neighbors.push(node.id)
-                    node.neighbors.push(this.id)
+                    this.neighbors.push(globalnodes.indexOf(node))
+                    node.neighbors.push(globalnodes.indexOf(this))
                 }
             } else {
                 if (this.type == 1) {
-                    if (this.neighbors.length < 3) {
+                    if (this.neighbors.length < 4) {
                         if (node.type != 1 && node.type != 3) {
-                            this.neighbors.push(node.id)
-                            node.neighbors.push(this.id)
+                            this.neighbors.push(globalnodes.indexOf(node))
+                            node.neighbors.push(globalnodes.indexOf(this))
                         }
                     }
                 }
                 if (this.type == 2) {
-                    if (this.neighbors.length < 2) {
+                    if (this.neighbors.length < 3) {
                         if (node.type != 2) {
-                            this.neighbors.push(node.id)
-                            node.neighbors.push(this.id)
+                            this.neighbors.push(globalnodes.indexOf(node))
+                            node.neighbors.push(globalnodes.indexOf(this))
                         }
                     }
                 }
                 if (this.type == 4) {
-                    if (this.neighbors.length < 2) {
-                        this.neighbors.push(node.id)
-                        node.neighbors.push(this.id) 
+                    if (this.neighbors.length < 1 && node.type != 4) {
+                        this.neighbors.push(globalnodes.indexOf(node))
+                        node.neighbors.push(globalnodes.indexOf(this)) 
                     }
                 }
     
@@ -2147,6 +2247,9 @@
         }
         drive() {
             
+            if(this.dead == 1){
+                return
+            }
     
             this.hit = 0
             this.fed = 0
@@ -2164,8 +2267,23 @@
                         this.energy-=.1
                     }
             }
+            if(this.x > canvas.width){
+                this.pushout+=Math.PI/(((Math.random()-.5)*4)+.01)
+            }
+            if(this.y > canvas.height){
+                this.pushout+=Math.PI/(((Math.random()-.5)*4)+.01)
+            }
+            if(this.x < 0){
+                this.pushout+=Math.PI/(((Math.random()-.5)*4)+.01)
+            }
+            if(this.y < 0){
+                this.pushout+=Math.PI/(((Math.random()-.5)*4)+.01)
+            }
         }
         make() {
+            if(this.dead == 1){
+                return
+            }
             if (this.type == 0) {
                 this.body = new Circle(this.x, this.y, 3, "blue")
             }
@@ -2187,10 +2305,16 @@
             this.y = Math.min(canvas.width, this.y)
         }
         drawBody() {
+            if(this.dead == 1){
+                return
+            }
     
             this.body.draw()
         }
         time() {
+            if(this.dead == 1){
+                return
+            }
             for (let t = 0; t < this.times.length; t++) {
                 if(this.energy >= 1){
                     this.times[t] += this.ticks[t]
@@ -2205,7 +2329,7 @@
         makeLink() {
             let z = 0
             for (let t = 0; t < globalnodes.length; t++) {
-                if (this.neighbors.includes(globalnodes[t].id)) {
+                if (this.neighbors.includes(t)) {
     
                     this.link.target = globalnodes[t]
                     while (this.link.hypotenuse() > this.lout) {
@@ -2233,6 +2357,7 @@
     
                                 if (this.type == 1 || this.type == 3) { 
                                         globalnodes[t].pushout = globalnodes[t].pushoutsto + this.times[z]
+                                        this.pushout = this.pushoutsto - this.times[z]
                                 }
                             } else {
     
@@ -2253,11 +2378,17 @@
             }
         }
         text(){
+
+            if(this.dead == 1){
+                return
+            }
+
             if(!keysPressed['h']){
 
                 return
             }
             canvas_context.fillStyle = "white"
+            canvas_context.lineWidth = 2
             canvas_context.strokeStyle = "black"
             canvas_context.font = "10px arial"
 
@@ -2269,21 +2400,40 @@
     
     let globalnodes = []
     
-      for(let t = 0;t<25;t++){
+    for(let t = 0;t<40;t++){
         let node = new Node(Math.random()*canvas.width,Math.random()*canvas.height, Math.floor(Math.random()*5))
+        if(Math.random() <1){
+            node.connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
+        }
+      }
+      for(let t = 0;t<16;t++){
+        let node = new Node(Math.random()*canvas.width,Math.random()*canvas.height, 4)
+        if(Math.random() <.2){
+            node.connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
+        }
       }
     
-      for(let t = 0;t<15;t++){
+      for(let t = 0;t<10;t++){
         globalnodes[Math.floor(Math.random()*globalnodes.length)].connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
       }
+      
     
+      for(let t = 0;t<globalnodes.length;t++){
+
+        if(globalnodes[t].neighbors.length == 0){
+            // globalnodes.splice(t,1)
+            // t--
+            globalnodes[t].dead = 1
+
+        }
+      }
     
     // let nod1 = new Node(100, 100, 0)
     // let nod2 = new Node(110, 100, 0)
     // let nod3 = new Node(130, 100, 0)
     // let nod4 = new Node(140, 100, 1)
     // let nod5 = new Node(140, 100, 2)
-    // // let nod6 = new Node(160, 100, 0)
+    // let nod6 = new Node(160, 100, 0)
     // let leaf1 = new Node(110, 110, 4)
     // let leaf2 = new Node(110, 90, 4)
     // let leaf3 = new Node(120, 110, 4)
@@ -2309,17 +2459,17 @@
     // nod3.connect(leaf3)
     // nod3.connect(leaf4)
     // nod2.connect(pivot1)
-    // // nod2.connect(pivot2)
-    // // nod2.connect(pivot3)
-    // // nod2.connect(pivot4)
+    // nod2.connect(pivot2)
+    // nod2.connect(pivot3)
+    // nod2.connect(pivot4)
     // nod1.connect(nod2)
     // pivot1.connect(nod3)
-    // // pivot2.connect(nod3)
-    // // pivot3.connect(nod3)
-    // // pivot4.connect(nod3)
+    // pivot2.connect(nod3)
+    // pivot3.connect(nod3)
+    // pivot4.connect(nod3)
     // nod3.connect(nod4)
     // nod4.connect(nod5)
-    // // nod.connect(nod3)
+    // nod.connect(nod3)
 
 
 
@@ -2335,10 +2485,18 @@
     // leaf1.connect(nod2)
     // leaf2.connect(nod2)
     
+    for(let t = 0;t<globalnodes.length;t++){
+
+        if(globalnodes[t].neighbors.length == 0){
+            globalnodes[t].dead = 1
+        }
+      }
     
     
+      let ld = 0
     
     function main() {
+        ld = 0
         macrodupe= 0
         seenToday = {}
         canvas_context.clearRect(0, 0, 720, 720)
@@ -2366,6 +2524,7 @@
             if (globalnodes[t].link.mark == 1) {
                 for (let r = 0; r < globalnodes[t].link.list.length; r++) {
                     globalnodes[t].link.target = globalnodes[globalnodes[t].link.list[r]]
+                    globalnodes[t].link.width = 2
                     globalnodes[t].link.draw()
                 }
             }
@@ -2384,6 +2543,11 @@
                         globalnodes[t].y += Math.sin(a) * .2
                         globalnodes[t].link.target.x -= Math.cos(a) * .2
                         globalnodes[t].link.target.y -= Math.sin(a) * .2
+                        if( !globalnodes[t].link.list.includes(k)){
+                            if( !globalnodes[k].link.list.includes(t)){
+                            globalnodes[t].pushout+=(Math.PI/(((Math.random()-.5)*100)+20))/10
+                            }
+                        }
                     }
                 }
             }
@@ -2398,6 +2562,7 @@
             globalnodes[t].text()
         }
         
+        ////console.log(ld)
     }
     
     // })
