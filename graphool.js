@@ -9,16 +9,19 @@
     let driftconstant = 500 //never set to 0 to get 0 drift set it to like 9999999999999999
     let mutationrate  = .05
     let maxage = 820
-    let generationConstant = .4 ///.4 works
+    let generationConstant = .5 ///.4 works
     let minage = 100
     let nodecap = 500
     let video_recorder
     let recording = 0
     let globduper = []
-    let predatorIncentive = 200
+    let predatorIncentive = 0
     let diffdist = 50
     let nodetypes = 7
-    let totalKill = 1
+    let totalKill = 0
+    let movementCost = .1
+    let baseCostOfNode = .025
+    let rotationCost = .05
     // function CanvasCaptureToWEBM(canvas, bitrate) {
     //     // the video_recorder is set to  '= new CanvasCaptureToWEBM(canvas, 4500000);' in the setup, 
     //     // it uses the same canvas as the rest of the file.
@@ -2243,10 +2246,10 @@
             macro.start = startin
             macro.f = f.sort((a,b)=>a>b?1:-1)
 
-            if(g >= (100*(Math.sqrt(Math.sqrt((m*30)-25)))) && glist.length>1 && macrodupe == 0){
+            if(g >= (125*(Math.sqrt(Math.sqrt((m))))) && glist.length>1 && macrodupe == 0){
 
                 //console.log((100*(Math.sqrt(Math.sqrt((m*30)-25)))) ,g)
-                g -= (100*(Math.sqrt(Math.sqrt((m*30)-25)))) 
+                g -= (125*(Math.sqrt(Math.sqrt((m))))) 
                 glist.sort((a,b)=>globalnodes.indexOf(a)>globalnodes.indexOf(b)?1:-1)
                 macrodupe = 1
 
@@ -2407,6 +2410,9 @@
             }
     
             this.age++
+            if(this.energy < .01){
+                this.age+= 10
+            }
             this.hit = 0
             this.fed = 0
             if (this.type == 4) {
@@ -2420,7 +2426,7 @@
                     if (this.energy >= 1) {
                         this.x += Math.cos(this.pushout) *3
                         this.y += Math.sin(this.pushout) *3
-                        this.energy-=.1
+                        this.energy-=movementCost
                     }
             }
             if(this.x >= canvas.width){
@@ -2494,7 +2500,7 @@
         }
         drawBody() {
                 if (this.energy >= .01) {
-                    this.energy-=.001
+                    this.energy-=baseCostOfNode
                 }
                 if(this.energy < 0){
                     this.energy  = 0
@@ -2565,7 +2571,7 @@
     
                     if (this.type == 1 || this.type == 3) {
                             if (this.energy >= .1) {
-                                this.energy-=.01
+                                this.energy-=rotationCost
                                 this.link.target.x = (this.link.target.x * (1 - this.rigs[z])) + (this.rigs[z] * lt.x)
                                 this.link.target.y = (this.link.target.y * (1 - this.rigs[z])) + (this.rigs[z] * lt.y)
     
@@ -2654,9 +2660,9 @@
     
     let globalnodes = []
     
-    for(let t = 0;t<3;t++){
+    for(let t = 0;t<30;t++){
         let node = new Node(Math.random()*canvas.width,Math.random()*canvas.height, Math.floor(Math.random()*nodetypes))
-        if(Math.random() <.1){
+        if(Math.random() <.51){
             node.connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
         }
       }
@@ -2778,28 +2784,47 @@
         globduper = []
         macrodupe= 0
         seenToday = {}
-        canvas_context.clearRect(0, 0, 360, 360)
+        canvas_context.clearRect(0, 0, canvas.width, canvas.height)
     
         for (let t = 0; t < globalnodes.length; t++) {
+
+            if(globalnodes[t].dead == 1){
+                continue
+            }
             globalnodes[t].time()
         }
         for (let t = 0; t < globalnodes.length; t++) {
+            if(globalnodes[t].dead == 1){
+                continue
+            }
             globalnodes[t].drive()
         }
 
         
         for (let t = 0; t < globalnodes.length; t++) {
+            if(globalnodes[t].dead == 1){
+                continue
+            }
             globalnodes[t].link.mark = 0
             globalnodes[t].link.list = []
         }
         for (let t = 0; t < globalnodes.length; t++) {
+            if(globalnodes[t].dead == 1){
+                continue
+            }
             globalnodes[t].makeLink()
         }
     
         for (let t = 0; t < globalnodes.length; t++) {
+            if(globalnodes[t].dead == 1){
+                continue
+            }
             globalnodes[t].make()
         }
         for (let t = 0; t < globalnodes.length; t++) {
+            if(globalnodes[t].dead == 1){
+                continue
+            }
             if (globalnodes[t].link.mark == 1) {
                 for (let r = 0; r < globalnodes[t].link.list.length; r++) {
                     if(globalnodes[globalnodes[t].link.list[r]].dead != 1 && globalnodes[t].dead != 1){
@@ -2812,9 +2837,15 @@
             }
         }
         for (let t = 0; t < globalnodes.length; t++) {
+            if(globalnodes[t].dead == 1){
+                continue
+            }
             globalnodes[t].drawBody()
         }
         for (let t = 0; t < globalnodes.length; t++) {
+            if(globalnodes[t].dead == 1){
+                continue
+            }
             if(globalnodes[t].age < minage){
                 // continue
             }
@@ -2928,13 +2959,13 @@
                         }
     
                         let a = globalnodes[t].link.angle()
-                        globalnodes[t].x += Math.cos(a) * .25
-                        globalnodes[t].y += Math.sin(a) * .25
-                        globalnodes[t].link.target.x -= Math.cos(a) * .25
-                        globalnodes[t].link.target.y -= Math.sin(a) * .25
+                        globalnodes[t].x += Math.cos(a) * .33
+                        globalnodes[t].y += Math.sin(a) * .33
+                        globalnodes[t].link.target.x -= Math.cos(a) * .33
+                        globalnodes[t].link.target.y -= Math.sin(a) * .33
                         if( !globalnodes[t].immune.includes(k)){
                             // if( !globalnodes[k].link.list.includes(t)){
-                            globalnodes[t].pushout+=(Math.PI/(((Math.random()-.5)*100)+20))/1
+                            globalnodes[t].pushout+=(Math.random()-.5)/10
                             // }
                         }
                     }
@@ -2994,7 +3025,7 @@
                         globalnodes[t].link.target.y -= Math.sin(a) *1
                         if( !globalnodes[t].immune.includes(k)){
                             // if( !globalnodes[k].link.list.includes(t)){
-                            globalnodes[t].pushout+=(Math.PI/(((Math.random()-.5)*100)+20))/1
+                            globalnodes[t].pushout+=(Math.random()-.5)/10
                             // }
                         }
                     }
