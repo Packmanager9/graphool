@@ -6,9 +6,19 @@
             t += 9
         }
     }
-    let nodecap = 1000
+    let driftconstant = 500 //never set to 0 to get 0 drift set it to like 9999999999999999
+    let mutationrate  = .05
+    let maxage = 820
+    let generationConstant = .4 ///.4 works
+    let minage = 100
+    let nodecap = 500
     let video_recorder
     let recording = 0
+    let globduper = []
+    let predatorIncentive = 200
+    let diffdist = 50
+    let nodetypes = 7
+    let totalKill = 1
     // function CanvasCaptureToWEBM(canvas, bitrate) {
     //     // the video_recorder is set to  '= new CanvasCaptureToWEBM(canvas, 4500000);' in the setup, 
     //     // it uses the same canvas as the rest of the file.
@@ -156,7 +166,7 @@
             }
             gamepadAPI.axesStatus = axes; // assign received values
             gamepadAPI.buttonsStatus = pressed;
-            // ////////console.log(pressed); // return buttons for debugging purposes
+            // //////////console.log(pressed); // return buttons for debugging purposes
             return pressed;
         },
         buttonPressed: function(button, hold) {
@@ -412,7 +422,7 @@
         }
         draw() {
             canvas_context.strokeStyle = this.color
-            canvas_context.lineWidth = 3
+            canvas_context.linewidth = 1.5
             canvas_context.strokeRect(this.x, this.y, this.width, this.height)
         }
         move() {
@@ -458,7 +468,7 @@
             this.strokeColor = strokeColor
         }
         draw() {
-            canvas_context.lineWidth = 2
+            canvas_context.linewidth = 1.5
             canvas_context.strokeStyle = this.color
             canvas_context.beginPath();
             if (this.radius > 0) {
@@ -665,14 +675,14 @@
             }
             canvas_context.strokeStyle = this.color
             canvas_context.fillStyle = this.color
-            canvas_context.lineWidth = 1
+            canvas_context.linewidth = 1.5
             canvas_context.beginPath()
             canvas_context.moveTo(this.nodes[0].x, this.nodes[0].y)
             for (let t = 1; t < this.nodes.length; t++) {
                 canvas_context.lineTo(this.nodes[t].x, this.nodes[t].y)
             }
             canvas_context.lineTo(this.nodes[0].x, this.nodes[0].y)
-            canvas_context.fill()
+            // canvas_context.fill()
             canvas_context.stroke()
             canvas_context.closePath()
         }
@@ -1017,7 +1027,7 @@
         draw() {
             this.beam()
             this.body.draw()
-            canvas_context.lineWidth = 1
+            canvas_context.linewidth = 1.5
             canvas_context.fillStyle = this.color
             canvas_context.strokeStyle = this.color
             canvas_context.beginPath()
@@ -1032,14 +1042,14 @@
         }
     }
     
-    function setUp(canvas_pass, style = "#888888") {
+    function setUp(canvas_pass, style = "#000000") {
         canvas = canvas_pass
         // video_recorder = new CanvasCaptureToWEBM(canvas, 4500000);
         canvas_context = canvas.getContext('2d');
         canvas.style.background = style
         window.setInterval(function() {
             main()
-        }, 10)
+        }, 1)
         document.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
         });
@@ -1253,7 +1263,7 @@
     
             canvas_context.fillStyle = this.color
             canvas_context.strokeStyle = this.color
-            canvas_context.lineWidth = 3
+            canvas_context.linewidth = 1.5
             canvas_context.stroke()
         }
         getQuadraticXY(t) {
@@ -1639,7 +1649,7 @@
             } // Fourth point
         ];
     
-        //////console.log(points)
+        ////////console.log(points)
         // Use a Set to track unique positions
         const uniquePositions = new Set();
     
@@ -1670,7 +1680,7 @@
         q = Math.round(q)
         r = Math.round(r)
         s = Math.round(s)
-        //////console.log(arePointsOverlapping(a, b, c, d, p, q, r, s))
+        ////////console.log(arePointsOverlapping(a, b, c, d, p, q, r, s))
         if (arePointsOverlapping(a, b, c, d, p, q, r, s)) {
             return false
         }
@@ -1799,7 +1809,7 @@
             for (let t = 0; t < this.pairs.length; t++) {
                 this.hash[this.pairs[t]] = this.lester[t]
             }
-            //////console.log(this)
+            ////////console.log(this)
         }
     }
     
@@ -1895,7 +1905,7 @@
     let organeo = new Organism()
     
     
-    //////console.log(organeo)
+    ////////console.log(organeo)
     
     let rmod = Math.floor(Math.random() * 25) + 5
     let gmod = Math.floor(Math.random() * 25) + 5
@@ -1921,15 +1931,17 @@
     let superclick = 0
     class Node {
         constructor(x, y, t) {
+            this.age = 0
+            this.immune = []
             this.neighbors = []
             this.type = t
             this.id = superclick
             superclick++
             this.x = x
             this.y = y
-            this.link = new LineOP(this, this, "cyan")
+            this.link = new LineOP(this, this, "white")
             this.link.list  =[]
-            this.lout = 12//8 + (Math.random() * 24)
+            this.lout = 11//8 + (Math.random() * 24)
             this.las = []
             for (let t = 0; t < 100; t++) {
                 this.las.push(Math.random() * 6.283)
@@ -1940,19 +1952,19 @@
             this.ticks = []
             for (let t = 0; t < 100; t++) {
                 this.times.push(0)
-                this.ticks.push(((Math.random() - .5) / 20))
+                this.ticks.push(((Math.random() - .5) / 16))
             }
             for (let t = 0; t < 100; t++) {
-                this.rigs.push(1 - ((Math.random() / 20) + .95))
+                this.rigs.push(1-((Math.random() / 10) +.9))
             }
             this.pushout =  Math.random() * 6.283
             this.pushoutsto = this.pushout
-            // //////console.log(this.id)
+            // ////////console.log(this.id)
             globalnodes.push(this)
             this.energy = 0
             this.generate = 0
             if (this.type == 4) {
-                this.generate = .4
+                this.generate = generationConstant
             }
             this.gencap = 1000
             this.energy = 0
@@ -1972,20 +1984,74 @@
             return scare
         }
         dupe(num){
+            // //console.log(num)
             if(this.dead == 1){
-                return
-            }
-            if(globalnodes.length > nodecap || num == 0){
                 return false
             }
-            // let node = new Node(Math.random()*720 ,Math.random()*720, this.type)
-            let node = new Node(this.x+((Math.random()-.5)*10), this.y+((Math.random()-.5)*10) , this.type)
-            return node
+
+            let alldead = 0
+            for(let t = 0;t<globalnodes.length;t++){
+                if(globalnodes[t].dead ==1){
+                    alldead++
+                }
+            }
+
+            if((globalnodes.length-alldead) >= nodecap || num == 0){
+                return false
+            }
+            // let node = new Node(Math.random()*360 ,Math.random()*360, this.type)
+            if(this.age > minage*2){
+                this.age = minage
+                let node = new Node(this.x+((Math.random()-.5)*10), this.y+((Math.random()-.5)*10) , this.type)
+
+                if(Math.random() < mutationrate){
+                    node.die = 1
+                }else{
+
+                    if(Math.random() < mutationrate){
+
+                        let superduper = {}
+                        superduper.linkto = globalnodes.indexOf(node)
+                        superduper.x = node.x
+                        superduper.y = node.y
+                        superduper.type = Math.floor(Math.random()*nodetypes)
+                        if(Math.random() < mutationrate){
+                        superduper.radio = 1
+                        }else{
+                            superduper.radio = 0
+                        }
+                        if(Math.random() < mutationrate){
+                            superduper.extra = 1
+                        }else{
+                            superduper.extra = 0 
+                        }
+                        globduper.push(superduper)
+                        
+        
+                        }
+        
+
+                }
+
+                return node
+            }
+
+            return false
         }
 
 
         //a teleporting magnolia tree that goes on adventures but lives on one place
         tupe(macro, node){
+            let alldead = 0
+            for(let t = 0;t<globalnodes.length;t++){
+                if(globalnodes[t].dead ==1){
+                    alldead++
+                }
+            }
+
+            if((globalnodes.length-alldead) >= nodecap ){
+                return false
+            }
             if(this.dead == 1){
                 return
             }
@@ -1994,16 +2060,19 @@
             //     table[macro.f[t]] = t
             // }
             //  let  babble  = macro.match[me]
-            //  //console.log(macro.f, node.linkup)
-            //  //console.log(table)
+            //  ////console.log(macro.f, node.linkup)
+            //  ////console.log(table)
             for(let t= 0 ;t<node.linkup.length;t++){
             let offset = macro.f.indexOf(node.linkup[t])
-            console.log(offset, macro.f, node.linkup) 
+            // //console.log(offset, macro.f, node.linkup) 
+                if(offset+macro.start < globalnodes.length){
             if(globalnodes[offset+macro.start].hitcon != 1){
             if(offset != -1){
   
-                node.connect(globalnodes[(offset+macro.start)])
-                // //console.log(globalnodes[(offset+macro.start)].type, globalnodes[node.linkup[t]].type)
+
+                    node.connect(globalnodes[(offset+macro.start)])
+                }
+                // ////console.log(globalnodes[(offset+macro.start)].type, globalnodes[node.linkup[t]].type)
                 // globalnodes[offset+macro.start].hitcon = 1
                 // node.hitcon = 1
             }
@@ -2023,7 +2092,7 @@
         //     let keys = Object.keys(macro.match)
         //     let arts = this.map(keys, macro.f)
 
-        //     ////console.log( arts, me)
+        //     //////console.log( arts, me)
         //     let letters = macro.match[arts[me]] 
         //     for(let t = 0;t<letters.length;t++){
         //         if(globalnodes[letters[t]+macro.start]){
@@ -2034,8 +2103,14 @@
         // }
         energyBalance(){
             if(this.dead == 1){
+
+                for(let t = 0;t<this.neighbors.length;t++){
+                    this.disconnect(globalnodes[this.neighbors[t]])
+                }
                 return
             }
+
+
 
 
             let glist = [this]
@@ -2046,7 +2121,7 @@
             for(let t =0 ;t<flist.length;t++){
                 if(flist[t]){ 
                     for(let k = 0;k<flist[t].neighbors.length;k++){
-                          if(f.includes((flist[t].neighbors[k]))){
+                          if(f.includes((flist[t].neighbors[k])) || globalnodes[flist[t].neighbors[k]].dead == 1){
                           }else{
                             if(globalnodes[flist[t].neighbors[k]]){
                                 f.push((flist[t].neighbors[k]))
@@ -2060,13 +2135,13 @@
 
                 }
             }
-            // //console.log(flist)
+            // ////console.log(flist)
             for(let t =0 ;t<flist.length;t++){
                 for(let k = 0;k<flist[t].neighbors.length;k++){
                     if(f.includes((flist[t].neighbors[k]))){
 
 
-                        // //console.log(flist)
+                        // ////console.log(flist)
                         let screw = 0
                         let snapout =0
                         for(let w = 0;w<glist.length;w++){
@@ -2077,12 +2152,12 @@
                                 screw = -1
                             }
                             if(keysPressed['g']){
-                            //console.log(globalnodes[flist[t].neighbors[k]].id)
+                            ////console.log(globalnodes[flist[t].neighbors[k]].id)
                             }
                             if(glist[w].id == globalnodes[flist[t].neighbors[k]].id){ 
                              screw = 1
                              snapout =1
-                            //  //console.log('s')
+                            //  ////console.log('s')
                             }
                         }
 
@@ -2096,28 +2171,70 @@
             }
 
 
+
+            for(let t = 0;t<glist.length;t++){
+                if(glist[t].radio == 1){
+                    let met = Math.floor(Math.random()*glist.length)
+                    if(met != t){
+                        glist[t].radio = 0
+                        glist[t].connect(glist[met])
+                    }
+                }
+
+            }
+
+            for(let t = 0;t<glist.length;t++){
+                if(glist[t].extra == 1){
+                    let met = Math.floor(Math.random()*glist.length)
+                    let mek = Math.floor(Math.random()*glist.length)
+                    console.log(met, mek)
+                    if(met != mek){
+                        glist[t].extra = 0
+                        glist[mek].connect(glist[met])
+                    }
+                }
+
+            }
+
             
             if(keysPressed['g']){
-                //console.log(f,glist)
+                ////console.log(f,glist)
             }
             let g = 0 
             let m = 0
+            let ag = 0
+            let ll = 0
             let p = 0
+
+            for(let t =0 ;t<glist.length;t++){
+                glist[t].immune = []
+                for(let k =0 ;k<glist.length;k++){
+                glist[t].immune.push(globalnodes.indexOf(glist[k]))
+                }
+            }
+
+
+
             for(let t =0 ;t<glist.length;t++){
                 // for(let k = 0;k<glist[t].link.list.length;k++){
                     g += glist[t].energy
                     p += glist[t].pushoutsto
+                    ag += glist[t].age
+                    ll += (glist[t].link.list.length+1)
                     m++
                 // }
             }
 
             if(keysPressed[' ']){
-                //////console.log(glist)
+                ////////console.log(glist)
             }
             g/=m
             p/=m
+            ag/=m
+            ll/=m
 
-            // //////console.log(g,m)
+
+            // ////////console.log(g,m)
 
             let matmatch = {}
             let startin = globalnodes.length
@@ -2126,13 +2243,14 @@
             macro.start = startin
             macro.f = f.sort((a,b)=>a>b?1:-1)
 
-            if(g >= (200/Math.sqrt(Math.sqrt(m))) && glist.length>1 && macrodupe == 0){
+            if(g >= (100*(Math.sqrt(Math.sqrt((m*30)-25)))) && glist.length>1 && macrodupe == 0){
 
-                g -= (200/Math.sqrt(Math.sqrt(m))) 
+                //console.log((100*(Math.sqrt(Math.sqrt((m*30)-25)))) ,g)
+                g -= (100*(Math.sqrt(Math.sqrt((m*30)-25)))) 
                 glist.sort((a,b)=>globalnodes.indexOf(a)>globalnodes.indexOf(b)?1:-1)
                 macrodupe = 1
 
-                //console.log(glist)
+                ////console.log(glist)
                 for(let t =0 ;t<glist.length;t++){
                         matmatch[globalnodes.indexOf(glist[t])] = []
                         // let mv  = []
@@ -2149,11 +2267,15 @@
 
                 let nodds = []
                 for(let t =0 ;t<glist.length;t++){
-                    let nodd = glist[t].dupe(2)
+                    // //console.log(glist[t].neighbors.length)
+                    let nodd = glist[t].dupe(glist[t].neighbors.length)
+
                     if(nodd != false){
-                        nodd.linkup = [...glist[t].neighbors]
+                        nodd.linkup = [...glist[t].neighbors] 
                         nodd.t = globalnodes.indexOf(glist[t])
                         nodds.push(nodd)
+                    }else{
+                        // return
                     }
                 }
                 for(let t =0 ;t<nodds.length;t++){
@@ -2167,7 +2289,7 @@
                 }
 
 
-                // //////console.log(macro)
+                // ////////console.log(macro)
             }
 
 
@@ -2175,6 +2297,8 @@
                 // for(let k = 0;k<glist[t].link.list.length;k++){
                     glist[t].energy = g
                     glist[t].pushoutsto = p
+                    glist[t].age = ag
+                    glist[t].ll = ll
                     glist[t].hit = 1
                     
                 // }
@@ -2182,14 +2306,33 @@
 
             this.energy = g
             this.pushoutsto = p
+            this.age = ag
+            this.ll = ll
             // this.pushout = p
 
-            // //////console.log(this)
+            // ////////console.log(this)
             this.hit = 1
+
+        }
+        disconnect(node){
+
+            // //console.log(node, this)
+            // if(node.neighbors.includes(globalnodes.indexOf(this))){
+                this.neighbors.splice(globalnodes.indexOf(node), 1) 
+                node.neighbors.splice(globalnodes.indexOf(this), 1)
+            // }
+            // if(this.neighbors.includes(globalnodes.indexOf(node))){
+                this.neighbors.splice(globalnodes.indexOf(node), 1)
+                node.neighbors.splice(globalnodes.indexOf(this), 1)
+            // }
+
 
         }
         connect(node) {
             if(this.dead == 1){
+                for(let t = 0;t<this.neighbors.length;t++){
+                    this.disconnect(globalnodes[this.neighbors[t]])
+                }
                 return
             }
 
@@ -2201,12 +2344,15 @@
             }
 
 
-            // this.neighbors.push(globalnodes.indexOf(node))
-            // node.neighbors.push(globalnodes.indexOf(this))
+            this.neighbors.push(globalnodes.indexOf(node))
+            node.neighbors.push(globalnodes.indexOf(this))
 
-            // return
+            return
 
-            if (this.type == 0 || this.type == 3) {
+            if (this.type == 6) {
+                this.neighbors.push(globalnodes.indexOf(node))
+                node.neighbors.push(globalnodes.indexOf(this)) 
+        }else  if (this.type == 0 || this.type == 3) {
                 if(this.type == 3){
                     if(node.type != 3 && node.type != 1){
 
@@ -2220,7 +2366,7 @@
                 }
             } else {
                 if (this.type == 1) {
-                    if (this.neighbors.length < 4) {
+                    if ((this.neighbors.length < 4|| node.type == 6)) {
                         if (node.type != 1 && node.type != 3) {
                             this.neighbors.push(globalnodes.indexOf(node))
                             node.neighbors.push(globalnodes.indexOf(this))
@@ -2228,7 +2374,7 @@
                     }
                 }
                 if (this.type == 2) {
-                    if (this.neighbors.length < 3) {
+                    if (this.neighbors.length < 3 || node.type == 6) {
                         if (node.type != 2) {
                             this.neighbors.push(globalnodes.indexOf(node))
                             node.neighbors.push(globalnodes.indexOf(this))
@@ -2236,7 +2382,13 @@
                     }
                 }
                 if (this.type == 4) {
-                    if (this.neighbors.length < 1 && node.type != 4) {
+                    if ((this.neighbors.length < 1|| node.type == 6) && node.type != 4 && node.type != 5) {
+                        this.neighbors.push(globalnodes.indexOf(node))
+                        node.neighbors.push(globalnodes.indexOf(this)) 
+                    }
+                }
+                if (this.type == 5) {
+                    if ((this.neighbors.length < 1|| node.type == 6) && node.type != 4) {
                         this.neighbors.push(globalnodes.indexOf(node))
                         node.neighbors.push(globalnodes.indexOf(this)) 
                     }
@@ -2248,9 +2400,13 @@
         drive() {
             
             if(this.dead == 1){
+                for(let t = 0;t<this.neighbors.length;t++){
+                    this.disconnect(globalnodes[this.neighbors[t]])
+                }
                 return
             }
     
+            this.age++
             this.hit = 0
             this.fed = 0
             if (this.type == 4) {
@@ -2262,42 +2418,74 @@
 
             if (this.type == 2 || this.type == 3) {
                     if (this.energy >= 1) {
-                        this.x += Math.cos(this.pushout) *this.lout/2
-                        this.y += Math.sin(this.pushout) *this.lout/2
+                        this.x += Math.cos(this.pushout) *3
+                        this.y += Math.sin(this.pushout) *3
                         this.energy-=.1
                     }
             }
-            if(this.x > canvas.width){
+            if(this.x >= canvas.width){
                 this.pushout+=Math.PI/(((Math.random()-.5)*4)+.01)
             }
-            if(this.y > canvas.height){
+            if(this.y >= canvas.height){
                 this.pushout+=Math.PI/(((Math.random()-.5)*4)+.01)
             }
-            if(this.x < 0){
+            if(this.x <= 0){
                 this.pushout+=Math.PI/(((Math.random()-.5)*4)+.01)
             }
-            if(this.y < 0){
+            if(this.y  <= 0){
                 this.pushout+=Math.PI/(((Math.random()-.5)*4)+.01)
             }
+
         }
         make() {
             if(this.dead == 1){
+                for(let t = 0;t<this.neighbors.length;t++){
+                    this.disconnect(globalnodes[this.neighbors[t]])
+                }
+                // this.x = 999999
+                // this.y = 999999+(Math.random()*100000)
+                this.body = new Circle(this.x, this.y, 3, "#0044FF")
                 return
             }
             if (this.type == 0) {
-                this.body = new Circle(this.x, this.y, 3, "blue")
+                this.body = new Circle(this.x, this.y, 4, "#ffffff")
             }
             if (this.type == 1) {
-                this.body = new Rectangle(this.x - 1.5, this.y - 1.5, 3, 3, "pink")
+                this.body = new Rectangle(this.x - 2, this.y - 2, 4, 4, "#FF00aa")
             }
             if (this.type == 2) {
-                this.body = new Polygon(this.x, this.y, 4, "red", 3, 0, 0, (this.pushout))
+                this.armor = 1
+                this.body = new Polygon(this.x, this.y, 5, "#FF8800", 3, 0, 0, (this.pushout))
             }
             if (this.type == 3) {
-                this.body = new Circle(this.x, this.y, 3, "Magenta")
+                this.body = new Circle(this.x, this.y, 4, "#aa00ff")
             }
             if (this.type == 4) {
-                this.body = new Polygon(this.x, this.y, 4, "#00ff00", 5, 0, 0, (this.pushout) + Math.PI)
+                this.produce = 1
+                this.body = new Polygon(this.x, this.y, 5, "#44ff00", 5, 0, 0, (this.pushout) + Math.PI)
+            }
+            if (this.type == 5) {
+                this.armor = 1
+                this.mouth = 1
+                this.body = new Polygon(this.x, this.y, 5, "#00FFFF", 4, 0, 0, (this.pushout) + Math.PI)
+            }
+            if (this.type == 6) {
+                this.armor = 1
+                this.body = new Polygon(this.x, this.y, 5, "#FF8800", 5, 0, 0, (this.pushout) + Math.PI)
+            }
+
+            //temperature proxy
+            if(this.age > maxage*.1){
+                this.x+=(Math.random()-.5)/10
+                this.y+=(Math.random()-.5)/10
+            }
+            if(this.age > maxage*.5){
+                this.x+=(Math.random()-.5)/5
+                this.y+=(Math.random()-.5)/5
+            }
+            if(this.age > maxage*.9){
+                this.x+=(Math.random()-.5)*.4
+                this.y+=(Math.random()-.5)*.4
             }
             this.x = Math.max(0, this.x)
             this.x = Math.min(canvas.width, this.x)
@@ -2305,7 +2493,17 @@
             this.y = Math.min(canvas.width, this.y)
         }
         drawBody() {
+                if (this.energy >= .01) {
+                    this.energy-=.001
+                }
+                if(this.energy < 0){
+                    this.energy  = 0
+                }
+            
             if(this.dead == 1){
+                for(let t = 0;t<this.neighbors.length;t++){
+                    this.disconnect(globalnodes[this.neighbors[t]])
+                }
                 return
             }
     
@@ -2313,6 +2511,9 @@
         }
         time() {
             if(this.dead == 1){
+                for(let t = 0;t<this.neighbors.length;t++){
+                    this.disconnect(globalnodes[this.neighbors[t]])
+                }
                 return
             }
             for (let t = 0; t < this.times.length; t++) {
@@ -2327,9 +2528,22 @@
 
 
         makeLink() {
+            if(this.dead == 1){
+                for(let t = 0;t<this.neighbors.length;t++){
+                    this.disconnect(globalnodes[this.neighbors[t]])
+                }
+                // return
+            }
             let z = 0
+            this.link.list = []
             for (let t = 0; t < globalnodes.length; t++) {
                 if (this.neighbors.includes(t)) {
+                    if(globalnodes[t].dead == 1){
+                        continue
+                    }
+                    if(this.dead == 1){
+                        continue
+                    }
     
                     this.link.target = globalnodes[t]
                     while (this.link.hypotenuse() > this.lout) {
@@ -2355,10 +2569,10 @@
                                 this.link.target.x = (this.link.target.x * (1 - this.rigs[z])) + (this.rigs[z] * lt.x)
                                 this.link.target.y = (this.link.target.y * (1 - this.rigs[z])) + (this.rigs[z] * lt.y)
     
-                                if (this.type == 1 || this.type == 3) { 
+                                // if (this.type == 1 || this.type == 3) { 
                                         globalnodes[t].pushout = globalnodes[t].pushoutsto + this.times[z]
-                                        this.pushout = this.pushoutsto - this.times[z]
-                                }
+                                        // this.pushout = this.pushoutsto - this.times[z]
+                                // }
                             } else {
     
                             }
@@ -2376,6 +2590,35 @@
                     globalnodes[t].link.list.push(globalnodes.indexOf(this))
                 }
             }
+
+            if(this.mouth == 1){
+                if(this.link.list.length == 0){
+                    this.dead = 1
+                }
+            }else{
+
+            let alldead = 0
+            for(let t = 0;t<globalnodes.length;t++){
+                if(globalnodes[t].dead ==1){
+                    alldead++
+                }
+            }
+
+
+                if(this.age > ((maxage-minage)-(globalnodes.length-alldead))){
+                    //console.log(((this.ll)*(this.ll))*((maxage-minage)-(globalnodes.length-alldead)), this.ll)
+                if(this.link.list.length == 0 || this.age > ((this.ll)*(this.ll))*((maxage-minage)-(globalnodes.length-alldead))){
+                    this.dead = 1
+                    if(totalKill == 1){
+                        if(totalKill == 1){
+                            for(let d = 0;d<this.immune.length;d++){
+                                globalnodes[this.immune[d]].dead = 1
+                            }
+                        }
+                    }
+                }
+                }
+            }
         }
         text(){
 
@@ -2383,39 +2626,60 @@
                 return
             }
 
-            if(!keysPressed['h']){
+            if(!keysPressed['h'] && !keysPressed['e']){
 
                 return
-            }
+            }else if(keysPressed['h']){
+
             canvas_context.fillStyle = "white"
-            canvas_context.lineWidth = 2
+            canvas_context.linewidth = 1.5
             canvas_context.strokeStyle = "black"
             canvas_context.font = "10px arial"
 
             this.energy = Math.round(this.energy*100)/100
             canvas_context.strokeText(this.energy, this.x, this.y)
             canvas_context.fillText(this.energy, this.x, this.y)
+            }else if(keysPressed['e']){
+            canvas_context.fillStyle = "white"
+            canvas_context.linewidth = 1.5
+            canvas_context.strokeStyle = "black"
+            canvas_context.font = "10px arial"
+
+            this.age = Math.round(this.age*100)/100
+            canvas_context.strokeText(this.age, this.x, this.y)
+            canvas_context.fillText(this.age, this.x, this.y)
+        }
         }
     }
     
     let globalnodes = []
     
-    for(let t = 0;t<40;t++){
-        let node = new Node(Math.random()*canvas.width,Math.random()*canvas.height, Math.floor(Math.random()*5))
-        if(Math.random() <1){
+    for(let t = 0;t<3;t++){
+        let node = new Node(Math.random()*canvas.width,Math.random()*canvas.height, Math.floor(Math.random()*nodetypes))
+        if(Math.random() <.1){
             node.connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
         }
       }
-      for(let t = 0;t<16;t++){
+    //   for(let t = 0;t<50;t++){
+    //       let node = new Node(360+ (Math.random()*80),360+ (Math.random()*80), Math.floor(Math.random()*6))
+    //       if(Math.random() <.8){
+    //           node.connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
+    //       }
+    //     }
+      for(let t = 0;t<2;t++){
         let node = new Node(Math.random()*canvas.width,Math.random()*canvas.height, 4)
         if(Math.random() <.2){
             node.connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
         }
       }
     
-      for(let t = 0;t<10;t++){
+      for(let t = 0;t<1;t++){
         globalnodes[Math.floor(Math.random()*globalnodes.length)].connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
       }
+
+    //   let nodem = new Node(360,360, 5)
+    //   nodem.connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
+    // //   nodem.connect(globalnodes[Math.floor(Math.random()*globalnodes.length)])
       
     
       for(let t = 0;t<globalnodes.length;t++){
@@ -2423,7 +2687,7 @@
         if(globalnodes[t].neighbors.length == 0){
             // globalnodes.splice(t,1)
             // t--
-            globalnodes[t].dead = 1
+            // globalnodes[t].dead = 1
 
         }
       }
@@ -2488,18 +2752,33 @@
     for(let t = 0;t<globalnodes.length;t++){
 
         if(globalnodes[t].neighbors.length == 0){
-            globalnodes[t].dead = 1
+            // globalnodes[t].dead = 1
         }
       }
     
     
+      canvas_context.imageSmoothingEnabled = false
       let ld = 0
     
     function main() {
+
+
+        
+
+
+        
         ld = 0
+        for(let t = 0;t<globduper.length;t++){
+
+            let node = new Node(globduper[t].x, globduper[t].y, globduper[t].type)
+            node.radio = globduper[t].radio
+            node.extra = globduper[t].extra
+            node.connect(globalnodes[globduper[t].linkto])
+        }
+        globduper = []
         macrodupe= 0
         seenToday = {}
-        canvas_context.clearRect(0, 0, 720, 720)
+        canvas_context.clearRect(0, 0, 360, 360)
     
         for (let t = 0; t < globalnodes.length; t++) {
             globalnodes[t].time()
@@ -2523,9 +2802,12 @@
         for (let t = 0; t < globalnodes.length; t++) {
             if (globalnodes[t].link.mark == 1) {
                 for (let r = 0; r < globalnodes[t].link.list.length; r++) {
-                    globalnodes[t].link.target = globalnodes[globalnodes[t].link.list[r]]
-                    globalnodes[t].link.width = 2
-                    globalnodes[t].link.draw()
+                    if(globalnodes[globalnodes[t].link.list[r]].dead != 1 && globalnodes[t].dead != 1){
+
+                        globalnodes[t].link.target = globalnodes[globalnodes[t].link.list[r]]
+                        globalnodes[t].link.width = 1.5
+                        globalnodes[t].link.draw()
+                    }
                 }
             }
         }
@@ -2533,20 +2815,187 @@
             globalnodes[t].drawBody()
         }
         for (let t = 0; t < globalnodes.length; t++) {
+            if(globalnodes[t].age < minage){
+                // continue
+            }
+            if(globalnodes[t].dead ==1){
+                continue
+            }
             for (let k = 0; k < globalnodes.length; k++) {
+                if(globalnodes[k].dead ==1){
+                    continue
+                }
+                let x = Math.abs(globalnodes[k].x - globalnodes[t].x) 
+                if(x > 10){
+                    if(x < diffdist){
+                        let z = globalnodes[k].x - globalnodes[t].x
+                        if( (!(globalnodes[t].link.target.immune.includes(t)))){
+                        globalnodes[k].x += Math.sign(z)/driftconstant
+                        globalnodes[t].x -= Math.sign(z)/driftconstant
+                        }
+                    }
+                    continue
+                }
+                let y = Math.abs(globalnodes[k].y - globalnodes[t].y) 
+                if(Math.abs(globalnodes[k].y - globalnodes[t].y) > 10){
+                    if(y < diffdist){
+                        let z = globalnodes[k].y - globalnodes[t].y
+                        if( (!(globalnodes[t].link.target.immune.includes(t)))){
+                        globalnodes[k].y += Math.sign(z)/driftconstant
+                        globalnodes[t].y -= Math.sign(z)/driftconstant
+                        }
+                    }
+                    continue
+                }
+
+
+                if(globalnodes[k].age < minage || globalnodes[t].age < minage && globalnodes[k].age!=globalnodes[t].age){
+
+                    globalnodes[t].link.target = globalnodes[k]
+
+                    let j = 0
+                    while (globalnodes[t].link.hypotenuse() < (14) && !globalnodes[t].link.target.immune.includes(t)) {
+                        j++
+                        if(j>1000){
+                            break
+                        }
+                        let a = globalnodes[t].link.angle()
+                        globalnodes[t].x += Math.cos(a) * 2
+                        globalnodes[t].y += Math.sin(a) * 2
+                        globalnodes[t].link.target.x -= Math.cos(a) * 2
+                        globalnodes[t].link.target.y -= Math.sin(a) * 2
+                    }
+
+                    
+                    continue
+                }
+
+                
                 if (t != k) {
                     globalnodes[t].link.target = globalnodes[k]
-                    while (globalnodes[t].link.hypotenuse() < (globalnodes[t].lout)) {
+                    let j = 0
+                    while (globalnodes[t].link.hypotenuse() <= (9)) {      
+                        j++
+                        if(j>10){
+                            break
+                        }
+                
+
+                        if(globalnodes[t].mouth == 1 &&  globalnodes[t].link.target.armor != 1 &&    (!(globalnodes[t].link.target.immune.includes(t)))){
+                            if(globalnodes[t].neighbors.includes(k)){
+                                
+                            }else{
+
+
+                                if(globalnodes[t].dead != 1 && globalnodes[t].link.target.dead!=1){
+
+                                    globalnodes[t].energy += (globalnodes[t].link.target.energy)+predatorIncentive
+                                    globalnodes[t].age -= globalnodes[t].link.target.energy
+                                    globalnodes[t].age = Math.max(globalnodes[t].age, minage)
+                                    globalnodes[t].energy = Math.min(globalnodes[t].energy, globalnodes[t].gencap)
+                                    globalnodes[t].link.target.dead = 1
+                                    if(totalKill == 1){
+                                        for(let d = 0;d<globalnodes[t].link.target.immune.length;d++){
+                                            globalnodes[globalnodes[t].link.target.immune[d]].dead = 1
+                                        }
+                                    }
+                                    for(let r = 0;r<globalnodes[t].link.target.neighbors.length;r++){
+                                        globalnodes[t].link.target.disconnect(globalnodes[globalnodes[t].link.target.neighbors[r]])
+                                    }
+                                }
+                            }
+                        }
+                        if(globalnodes[t].link.target.mouth == 1 && globalnodes[t].armor != 1 &&  (!(globalnodes[t].immune.includes(k)))){
+                            if(globalnodes[t].link.target.neighbors.includes(t)){
+                                
+                            }else{
+                                if(globalnodes[t].dead != 1 && globalnodes[t].link.target.dead!=1){
+                                    globalnodes[t].link.target.energy += (globalnodes[t].energy)+predatorIncentive
+                                    globalnodes[t].link.target.age -= globalnodes[t].energy
+                                    globalnodes[t].link.target.age = Math.max(globalnodes[t].link.target.age, minage)
+                                    globalnodes[t].link.target.energy = Math.min(globalnodes[t].link.target.energy, globalnodes[t].link.target.gencap)
+                                    globalnodes[t].dead = 1
+                                    if(totalKill == 1){
+                                    for(let d = 0;d<globalnodes[t].immune.length;d++){
+                                        globalnodes[globalnodes[t].immune[d]].dead = 1
+                                    }
+                                }
+                                    for(let r = 0;r<globalnodes[t].neighbors.length;r++){
+                                        globalnodes[t].disconnect(globalnodes[globalnodes[t].neighbors[r]])
+                                    }
+                                }
+                            }
+                        }
     
                         let a = globalnodes[t].link.angle()
-                        globalnodes[t].x += Math.cos(a) * .2
-                        globalnodes[t].y += Math.sin(a) * .2
-                        globalnodes[t].link.target.x -= Math.cos(a) * .2
-                        globalnodes[t].link.target.y -= Math.sin(a) * .2
-                        if( !globalnodes[t].link.list.includes(k)){
-                            if( !globalnodes[k].link.list.includes(t)){
-                            globalnodes[t].pushout+=(Math.PI/(((Math.random()-.5)*100)+20))/10
+                        globalnodes[t].x += Math.cos(a) * .25
+                        globalnodes[t].y += Math.sin(a) * .25
+                        globalnodes[t].link.target.x -= Math.cos(a) * .25
+                        globalnodes[t].link.target.y -= Math.sin(a) * .25
+                        if( !globalnodes[t].immune.includes(k)){
+                            // if( !globalnodes[k].link.list.includes(t)){
+                            globalnodes[t].pushout+=(Math.PI/(((Math.random()-.5)*100)+20))/1
+                            // }
+                        }
+                    }
+
+                    if (globalnodes[t].link.hypotenuse() <= (9.6)) {
+
+
+                        if(globalnodes[t].mouth == 1 &&  globalnodes[t].link.target.armor != 1 &&    (!(globalnodes[t].link.target.immune.includes(t)))){
+                            if(globalnodes[t].neighbors.includes(k)){
+                                
+                            }else{
+
+
+                                if(globalnodes[t].dead != 1 && globalnodes[t].link.target.dead!=1){
+
+                                    globalnodes[t].energy += (globalnodes[t].link.target.energy)+predatorIncentive
+                                    globalnodes[t].age -= globalnodes[t].link.target.energy
+                                    globalnodes[t].age = Math.max(globalnodes[t].age, minage)
+                                    globalnodes[t].energy = Math.min(globalnodes[t].energy, globalnodes[t].gencap)
+                                    globalnodes[t].link.target.dead = 1
+                                    if(totalKill == 1){
+                                        for(let d = 0;d<globalnodes[t].link.target.immune.length;d++){
+                                            globalnodes[globalnodes[t].link.target.immune[d]].dead = 1
+                                        }
+                                    }
+                                    for(let r = 0;r<globalnodes[t].link.target.neighbors.length;r++){
+                                        globalnodes[t].link.target.disconnect(globalnodes[globalnodes[t].link.target.neighbors[r]])
+                                    }
+                                }
                             }
+                        }
+                        if(globalnodes[t].link.target.mouth == 1 && globalnodes[t].armor != 1 &&  (!(globalnodes[t].immune.includes(k)))){
+                            if(globalnodes[t].link.target.neighbors.includes(t)){
+                                
+                            }else{
+                                if(globalnodes[t].dead != 1 && globalnodes[t].link.target.dead!=1){
+                                    globalnodes[t].link.target.energy += (globalnodes[t].energy)+predatorIncentive
+                                    globalnodes[t].link.target.age -= globalnodes[t].energy
+                                    globalnodes[t].link.target.age = Math.max(globalnodes[t].link.target.age, minage)
+                                    globalnodes[t].link.target.energy = Math.min(globalnodes[t].link.target.energy, globalnodes[t].link.target.gencap)
+                                    globalnodes[t].dead = 1
+                                    if(totalKill == 1){
+                                    for(let d = 0;d<globalnodes[t].immune.length;d++){
+                                        globalnodes[globalnodes[t].immune[d]].dead = 1
+                                    }
+                                }
+                                    for(let r = 0;r<globalnodes[t].neighbors.length;r++){
+                                        globalnodes[t].disconnect(globalnodes[globalnodes[t].neighbors[r]])
+                                    }
+                                }
+                            }
+                        }
+                        let a = globalnodes[t].link.angle()
+                        globalnodes[t].x += Math.cos(a) * 1
+                        globalnodes[t].y += Math.sin(a) *1
+                        globalnodes[t].link.target.x -= Math.cos(a) * 1
+                        globalnodes[t].link.target.y -= Math.sin(a) *1
+                        if( !globalnodes[t].immune.includes(k)){
+                            // if( !globalnodes[k].link.list.includes(t)){
+                            globalnodes[t].pushout+=(Math.PI/(((Math.random()-.5)*100)+20))/1
+                            // }
                         }
                     }
                 }
@@ -2560,9 +3009,20 @@
         }
         for (let t = 0; t < globalnodes.length; t++) {
             globalnodes[t].text()
+            if(globalnodes[t].die == 1){
+                globalnodes[t].dead = 1
+            }
         }
         
-        ////console.log(ld)
+        let alldead = 0
+        for(let t = 0;t<globalnodes.length;t++){
+            if(globalnodes[t].dead ==1){
+                alldead++
+            }
+        }
+
+        canvas_context.fillText(globalnodes.length+" / "+alldead, 5,10)
+        //////console.log(ld)
     }
     
     // })
